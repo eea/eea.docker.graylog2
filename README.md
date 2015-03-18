@@ -62,5 +62,6 @@ persistent between container restarts.
 
   __Note:__ This option works only with custom server or
   web interface configs because the default config expects elastic and mongo to be on localhost.
+
   __Note:__ Mongo and ElasticSearch are not directly configurable
   so please use this option with at either ```graylog-server``` or ```graylog-web``` set.
