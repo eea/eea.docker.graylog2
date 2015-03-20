@@ -32,6 +32,10 @@ If you don't want to version your admin password in a ```docker-compose``` file
 just log into ```localhost:9000``` after running the above command and setup your user or LDAP.
 Then, re-run the image without the GRAYLOG_PASSWORD environment variable.
 
+__Note__: The password salt is regenerated after each image build. If you added
+an user and upgraded the image, the user's credentials will be unusable.
+Follow [these steps](#config) to keep a consistent password salt between image updates.
+
 ```
 docker run -v /path/to/your/data:/data -p 9000:9000 eeacms/graylog2
 ```
@@ -43,9 +47,11 @@ each run. To have a persistent node_id use this:
 ```
 docker run -v /path/to/your/data:/data -p 9000:9000 -e GRAYLOG_NODE_ID=node1 eeacms/graylog2
 ```
+
 ### Running on a multi-node setup(beta)
 
 First, specify your configs locally as specified [here](#config)
+
 Then, enable only the services that you want to run via the ```ENABLED_SERVICES```
 environment variable as specified [here](#environment-variables)
 
