@@ -1,20 +1,53 @@
-# All-in-one Graylog2 Docker image
+# All-in-one, ready to run Graylog2 Docker image
+
+Out of the box, ready to run graylog2 image.
+
+Fit for open-source apps and configs.
+
+Can run without specifying an admin password.
+
+## Versions:
+* latest: graylog2 1.0.0
+* 1.0.0: graylog2 1.0.0
 
 ## Basic configuration
-Basic run:
+### Simple run:
 ```
-docker run -e GRAYLOG_PASSWORD=password eeacms/graylog2
+docker run -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
+```
+Go to ```localhost:9000``` and log in using the __user:__ _admin_ and the __password:__ _password_
+to check that graylog is running.
+
+### Making the data persistent:
+```
+docker run -v /path/to/your/data:/data -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
 ```
 
-Making the data persistent:
+/data/mongodb contains mongodb data
+
+/data/elasticsearch contains elasticsearch data
+
+### Running with an unusable admin password
+If you don't want to version your admin password in a ```docker-compose``` file
+just log into ```localhost:9000``` after running the above command and setup your user or LDAP.
+Then, re-run the image without the GRAYLOG_PASSWORD environment variable.
+
 ```
-docker run -v /path/to/your/data:/data eeacms/graylog2
+docker run -v /path/to/your/data:/data -p 9000:9000 eeacms/graylog2
 ```
 
-Forwarding the web interface port:
+### Keeping node configuration persistent:
+Graylog2 stores node config in a key: value manner, where the key is the node's id.
+When using docker, the node id is given by the container id wich is regenerated after
+each run. To have a persistent node_id use this:
 ```
-docker run -p 9000:9000 eeacms/graylog2
+docker run -v /path/to/your/data:/data -p 9000:9000 -e GRAYLOG_NODE_ID=node1 eeacms/graylog2
 ```
+### Running on a multi-node setup(beta)
+
+First, specify your configs locally as specified [here](#config)
+Then, enable only the services that you want to run via the ```ENABLED_SERVICES```
+environment variable as specified [here](#environment-variables)
 
 ## Ports
 
@@ -65,3 +98,7 @@ persistent between container restarts.
 
   __Note:__ Mongo and ElasticSearch are not directly configurable
   so please use this option with at either ```graylog-server``` or ```graylog-web``` set.
+  
+# Contributing
+
+If you used this image and saw something that can be improved, please send a Pull Request.
