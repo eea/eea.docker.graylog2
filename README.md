@@ -1,14 +1,14 @@
 # All-in-one, ready to run Graylog2 Docker image
 
-Out of the box, ready to run graylog2 image.
+Out of the box, ready to run Graylog2 image.
 
 Fit for open-source apps and configs.
 
 Can run without specifying an admin password.
 
 ## Versions:
-* latest: graylog2 1.0.0
-* 1.0.0: graylog2 1.0.0
+* latest: Graylog2 1.0.0
+* 1.0.0: Graylog2 1.0.0
 
 ## Basic configuration
 ### Simple run:
@@ -19,6 +19,12 @@ Go to ```localhost:9000``` and log in using the __user:__ _admin_ and the __pass
 to check that graylog is running.
 
 ### Making the data persistent:
+To reduce the risk of adding zombie volumes, the default image stores the data
+inside the container. To make it persistent between runs or image upgrades you
+can do one of the following:
+
+* Mount a host volume inside the container:
+
 ```
 docker run -v /path/to/your/data:/data -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
 ```
@@ -26,6 +32,23 @@ docker run -v /path/to/your/data:/data -e GRAYLOG_PASSWORD=password -p 9000:9000
 /data/mongodb contains mongodb data
 
 /data/elasticsearch contains elasticsearch data
+
+* Use a data-only container.
+  If you don't want to impact the host's filesystem structure and use a
+  container-only solution, you can use a data-only container.
+
+First, create a container having a /data volume and give it an easy to remember
+name:
+```
+docker run -v /data --name graylog2data ubuntu true
+```
+
+Then, mount the volumes defined in graylog2data using the --volumes-from
+option.
+
+```
+docker run --volumes-from graylog2data -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
+```
 
 ### Running with an unusable admin password
 If you don't want to version your admin password in a ```docker-compose``` file
@@ -50,18 +73,22 @@ docker run -v /path/to/your/data:/data -p 9000:9000 -e GRAYLOG_NODE_ID=node1 eea
 
 ### Running on a multi-node setup(beta)
 
-First, specify your configs locally as specified [here](#config)
+First, specify your configs locally as specified in the Useful Directories
+section.
 
 Then, enable only the services that you want to run via the ```ENABLED_SERVICES```
-environment variable as specified [here](#environment-variables)
+environment variable as specified in the Environment Variables section
 
 ## Ports
 
-* 9000 - graylog2 web interface
-* 12900 - graylog2 server API
+* 9000 - Graylog2 web interface
+* 12900 - Graylog2 server API
 * 12201 - GELF input
 
-## Volumes
+## Useful Directories
+
+These directories can be added as volumes in order to have a better control
+over the behavior of Graylog2.
 
 ### /config
 

@@ -6,9 +6,9 @@ RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen
 RUN apt-get update -q
 RUN apt-get install wget -y
 
-VOLUME ["/data"]
-VOLUME ["/logs"]
-VOLUME ["/conf"]
+RUN mkdir -p /data
+RUN mkdir -p /logs
+RUN mkdir -p /conf
 
 WORKDIR /opt
 
