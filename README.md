@@ -39,6 +39,7 @@ docker run -v /path/to/your/data:/data -e GRAYLOG_PASSWORD=password -p 9000:9000
 
 First, create a container having a /data volume and give it an easy to remember
 name:
+
 ```
 docker run -v /data --name graylog2data ubuntu true
 ```
@@ -67,6 +68,7 @@ docker run -v /path/to/your/data:/data -p 9000:9000 eeacms/graylog2
 Graylog2 stores node config in a key: value manner, where the key is the node's id.
 When using docker, the node id is given by the container id wich is regenerated after
 each run. To have a persistent node_id use this:
+
 ```
 docker run -v /path/to/your/data:/data -p 9000:9000 -e GRAYLOG_NODE_ID=node1 eeacms/graylog2
 ```
