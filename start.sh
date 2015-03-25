@@ -40,12 +40,12 @@ chmod -R 755 /logs
 
 
 if ! [ -z $ENABLE_ES ]; then
-    chown elasticsearch:elasticsearch /data/elasticsearch
-    chown elasticsearch:elasticsearch /logs/elasticsearch
+    chown -R elasticsearch:elasticsearch /data/elasticsearch
+    chown -R elasticsearch:elasticsearch /logs/elasticsearch
 fi
 if ! [ -z $ENABLE_MONGO ]; then
-    chown mongodb:mongodb /data/mongodb
-    chown mongodb:mongodb /logs/mongodb
+    chown -R mongodb:mongodb /data/mongodb
+    chown -R mongodb:mongodb /logs/mongodb
 fi
 
 # Override defaults if set in the /conf volume
