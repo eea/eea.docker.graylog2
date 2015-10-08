@@ -1,10 +1,10 @@
-FROM dockerfile/java:openjdk-7-jre
+FROM java:openjdk-7-jre
 MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' > /etc/apt/sources.list.d/mongodb.list
+RUN echo 'deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen' > /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update -q
-RUN apt-get install wget -y
+RUN apt-get install wget sudo netcat supervisor -y
 
 RUN mkdir -p /data
 RUN mkdir -p /logs
@@ -48,6 +48,7 @@ RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.
 
 EXPOSE 9000 12201/udp 12900
 
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./start.sh start.sh
-CMD /opt/start.sh
+CMD ["/usr/bin/supervisord"]
 
