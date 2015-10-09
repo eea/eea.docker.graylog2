@@ -3,12 +3,11 @@ MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 RUN echo 'deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen' > /etc/apt/sources.list.d/mongodb.list
-RUN apt-get update -q
-RUN apt-get install wget sudo netcat supervisor -y
+RUN apt-get update -q && \
+    apt-get install wget sudo netcat python3-pip -y && \
+    pip3 install chaperone
 
-RUN mkdir -p /data
-RUN mkdir -p /logs
-RUN mkdir -p /conf
+RUN mkdir -p /data /logs /conf /etc/chaperone.d
 
 WORKDIR /opt
 
@@ -16,8 +15,7 @@ ENV GRAYLOG_VERSION="1.0.0"
 ENV ES_VERSION="1.4.4"
 
 # Get mongo
-RUN apt-get install mongodb-org-server -y
-RUN apt-get install pwgen -y
+RUN apt-get install mongodb-org-server pwgen -y
 
 # Get elasticsearch
 RUN wget "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.tar.gz" -q
@@ -48,7 +46,6 @@ RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.
 
 EXPOSE 9000 12201/udp 12900
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./start.sh start.sh
-CMD ["/usr/bin/supervisord"]
-
+ENTRYPOINT ["/usr/local/bin/chaperone"]
