@@ -5,6 +5,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 RUN echo 'deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen' > /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update -q && \
     apt-get install wget sudo netcat python3-pip -y && \
+    apt-get clean && \
     pip3 install chaperone
 
 RUN mkdir -p /data /logs /conf /etc/chaperone.d
