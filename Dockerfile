@@ -12,8 +12,8 @@ RUN mkdir -p /data /logs /conf /etc/chaperone.d
 
 WORKDIR /opt
 
-ENV GRAYLOG_VERSION="1.0.0"
-ENV ES_VERSION="1.4.4"
+ENV GRAYLOG_VERSION="1.2.1"
+ENV ES_VERSION="1.7.3"
 
 # Get mongo
 RUN apt-get install mongodb-org-server pwgen -y
