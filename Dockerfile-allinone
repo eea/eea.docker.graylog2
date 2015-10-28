@@ -1,8 +1,10 @@
 FROM java:openjdk-7-jre
 MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+RUN echo 'deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen' > /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update -q && \
-    apt-get install wget sudo netcat python3-pip pwgen -y && \
+    apt-get install wget sudo netcat python3-pip -y && \
     apt-get clean && \
     pip3 install chaperone
 
@@ -11,6 +13,16 @@ RUN mkdir -p /data /logs /conf /etc/chaperone.d
 WORKDIR /opt
 
 ENV GRAYLOG_VERSION="1.2.1"
+ENV ES_VERSION="1.7.3"
+
+# Get mongo
+RUN apt-get install mongodb-org-server pwgen -y
+
+# Get elasticsearch
+RUN wget "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.tar.gz" -q
+RUN tar -xf "elasticsearch-$ES_VERSION.tar.gz" && rm "elasticsearch-$ES_VERSION.tar.gz"
+RUN mv "elasticsearch-$ES_VERSION" elasticsearch
+RUN useradd -s /bin/false -r -M elasticsearch
 
 # Get graylog2 web and server and install into /opt/
 ENV GRAYLOG_SERVER="graylog-$GRAYLOG_VERSION"
@@ -30,7 +42,6 @@ RUN chown graylog2:root /opt/graylog2-server /opt/graylog2-web-interface
 # Setup basic config
 RUN cp graylog2-server/graylog.conf.example /etc/graylog/server/server.conf
 RUN sed -i -e "s/password_secret =.*$/password_secret = $(pwgen -s 96)/" /etc/graylog/server/server.conf
-RUN sed -i -e "s/mongodb:\/\/localhost\/graylog2.*$/mongodb:\/\/mongodb.service\/graylog2/" /etc/graylog/server/server.conf
 RUN sed -i -e "s/application.secret=.*$/application.secret=$(pwgen -s 96)/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
 RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.0.1:12900\/\"/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
 
@@ -39,4 +50,3 @@ EXPOSE 9000 12201/udp 12900
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./start.sh start.sh
 ENTRYPOINT ["/usr/local/bin/chaperone"]
-
