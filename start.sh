@@ -6,7 +6,7 @@ cd /opt/
 
 # Parse enabled services
 if [ -z $ENABLED_SERVICES ]; then
-    ENABLED_SERVICES="elasticsearch,mongodb,graylog-web,graylog-server"
+    ENABLED_SERVICES="graylog-web,graylog-server"
 fi
 
 for service in $(echo $ENABLED_SERVICES | sed 's/ //g' | sed 's/,/\n/g'); do
