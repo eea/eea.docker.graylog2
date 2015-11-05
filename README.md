@@ -7,7 +7,8 @@ Fit for open-source apps and configs.
 Can run without specifying an admin password.
 
 ## Versions:
-* latest: Graylog2 1.2.1 standalone
+* latest: Graylog2 1.2.1 with email transport configuration
+* 1.2.1-2: Graylog2 1.2.1 with email transport configuration
 * 1.2.1-1: Graylog2 1.2.1 standalone
 * 1.2.1: Graylog2 1.2.1 allinone
 * 1.0.0: Graylog2 1.0.0
