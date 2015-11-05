@@ -17,7 +17,7 @@ Can run without specifying an admin password.
 * ElasticSearch - [https://www.elastic.co](https://www.elastic.co)
 * MongoDB - [https://www.mongodb.org](https://www.mongodb.org)
 
-For a quick configuration example view [eea.docker.logcentral](https://github.com/eea/eea.docker.logcentral/blob/master/docker-compose.yml) 
+For a quick configuration example view [eea.docker.logcentral](https://github.com/eea/eea.docker.logcentral/blob/master/docker-compose.yml)
 
 ## Ports
 
@@ -46,6 +46,39 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 
   __Note:__ Mongo and ElasticSearch are not directly configurable
   so please use this option with at either ```graylog-server``` or ```graylog-web``` set.
+
+### Email transport configuration
+
+* ```GRAYLOG_EMAIL_ENABLED``` - run the container with transport mail enable.
+ 
+  __Note:__ the value of this parameter is ```true``` or ```false```
+
+* ```GRAYLOG_EMAIL_HOSTNAME``` - the hostname of mail server.
+
+* ```GRAYLOG_EMAIL_PORT``` - the port of mail server.
+
+* ```GRAYLOG_EMAIL_USEAUTH``` - set ```true``` if mail server use authentication, ```false``` otherwise.
+
+  __Note:__ the value of this parameter is ```true``` or ```false```
+
+* ```GRAYLOG_EMAIL_USETLS``` - set ```true``` if mail server use TLS authentication, ```false``` otherwise.
+
+  __Note:__ the value of this parameter is ```true``` or ```false```
+
+* ```GRAYLOG_EMAIL_USESSL``` - set ```true``` if mail server use SSL authentication, ```false``` otherwise.
+
+  __Note:__ the value of this parameter is ```true``` or ```false```
+
+* ```GRAYLOG_EMAIL_AUTHUSERNAME``` - the username used to connect to mail server if it use authentication.
+
+* ```GRAYLOG_EMAIL_AUTHPSW``` - the password used to connect to mail server if it use authentication.
+
+* ```GRAYLOG_EMAIL_SUBJECT_PREFIX``` - the subject prefix of sended emails.
+
+* ```GRAYLOG_EMAIL_FROM_EMAIL``` - the sender email.
+
+* ```GRAYLOG_EMAIL_WEB_URL``` - the graylog2 web url used if you want to include links to the stream in your stream alert mails.
+This should define the fully qualified base url to your web interface exactly the same way as it is accessed by your users.
 
 ## All in One Graylog2
 use Dockerfile-allinone to build a docker image with elasticsearch and mongodb
