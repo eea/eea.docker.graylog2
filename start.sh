@@ -6,7 +6,7 @@ cd /opt/
 
 # Parse enabled services
 if [ -z $ENABLED_SERVICES ]; then
-    ENABLED_SERVICES="graylog-web,graylog-server"
+    ENABLED_SERVICES="graylog-web,graylog-server,monit"
 fi
 
 for service in $(echo $ENABLED_SERVICES | sed 's/ //g' | sed 's/,/\n/g'); do
@@ -21,6 +21,9 @@ for service in $(echo $ENABLED_SERVICES | sed 's/ //g' | sed 's/,/\n/g'); do
     fi
     if [ "graylog-server" = $service ]; then
         ENABLE_SERVER="true"
+    fi
+    if [ "monit" = $service ]; then
+        ENABLE_MONIT="true"
     fi
 done
 
@@ -199,6 +202,12 @@ if ! [ -z $ENABLE_SERVER ]; then
     # Extra sleep for making the interface not yield an error
     echo "Started"
 fi
+
+# Start monit
+if ! [ -z $ENABLE_MONIT ]; then
+     sh -c "monit -c /etc/monit/monitrc"
+fi
+
 
 # Start graylog2 web interface and leave this as main output
 if ! [ -z $ENABLE_WEB ]; then

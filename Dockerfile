@@ -2,7 +2,7 @@ FROM java:openjdk-7-jre
 MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 
 RUN apt-get update -q && \
-    apt-get install wget sudo netcat python3-pip pwgen -y && \
+    apt-get install wget sudo netcat python3-pip pwgen monit --no-install-recommends -y && \
     apt-get clean && \
     pip3 install chaperone
 
@@ -34,7 +34,7 @@ RUN sed -i -e "s/mongodb:\/\/localhost\/graylog2.*$/mongodb:\/\/mongodb.service\
 RUN sed -i -e "s/application.secret=.*$/application.secret=$(pwgen -s 96)/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
 RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.0.1:12900\/\"/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
 
-EXPOSE 9000 12201/udp 12900
+EXPOSE 9000 12201/udp 12900 2812
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./start.sh start.sh
