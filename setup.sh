@@ -1,55 +1,25 @@
 #!/bin/bash
-set -e
 
-# Services starter for graylog2
-cd /opt/
-
-# Parse enabled services
-if [ -z $ENABLED_SERVICES ]; then
-    ENABLED_SERVICES="graylog-web,graylog-server,monit"
-fi
-
-for service in $(echo $ENABLED_SERVICES | sed 's/ //g' | sed 's/,/\n/g'); do
-    if [ "elasticsearch" = $service ]; then
-        ENABLE_ES="true"
-    fi
-    if [ "mongodb" = $service ]; then
-        ENABLE_MONGO="true"
-    fi
-    if [ "graylog-web" = $service ]; then
-        ENABLE_WEB="true"
-    fi
-    if [ "graylog-server" = $service ]; then
-        ENABLE_SERVER="true"
-    fi
-    if [ "monit" = $service ]; then
-        ENABLE_MONIT="true"
-    fi
-done
+# Clean up from previous executions (if any)
+rm -rf /var/run/*.pid /tmp/*.pid
 
 # Make data dirs
 if ! [ -z $ENABLE_ES ]; then
     mkdir -p /data/elasticsearch
     mkdir -p /logs/elasticsearch
+    chown -R elasticsearch:elasticsearch /data/elasticsearch /logs/elasticsearch >/dev/null 2>&1
 fi
 
 if ! [ -z $ENABLE_MONGO ]; then
     mkdir -p /data/mongodb
     mkdir -p /logs/mongodb
+    chown -R mongodb:mongodb /data/mongodb /logs/mongodb >/dev/null 2>&1
 fi
 
 chmod -R 755 /data
 chmod -R 755 /logs
 
-
-if ! [ -z $ENABLE_ES ]; then
-    chown -R elasticsearch:elasticsearch /data/elasticsearch
-    chown -R elasticsearch:elasticsearch /logs/elasticsearch
-fi
-if ! [ -z $ENABLE_MONGO ]; then
-    chown -R mongodb:mongodb /data/mongodb
-    chown -R mongodb:mongodb /logs/mongodb
-fi
+chmod 777 /run    # Assure all users can write their PID files and other transient runtime data
 
 # Override defaults if set in the /conf volume
 if [ -f /conf/graylog-server.conf ]; then
@@ -61,31 +31,7 @@ if [ -f /conf/graylog-web-interface.conf ]; then
     echo "Running with custom web interface conf"
 fi
 
-# Start ES
-if ! [ -z $ENABLE_ES ]; then
-    echo -n "Starting elasticsearch... "
-    sudo -H -u elasticsearch bash -c                \
-        "/opt/elasticsearch/bin/elasticsearch       \
-         -Des.path.data=/data/elasticsearch         \
-         -Des.cluster.name=graylog2                 \
-         -Des.path.logs=/logs/elasticsearch/        \
-         -d"
-    while ! echo exit | nc -z -w 3 localhost 9200;  do sleep 3; done
-    echo "Started"
-fi
-
-# Start mongo
-if ! [ -z $ENABLE_MONGO ]; then
-    echo -n "Starting mongodb... "
-    sudo -H -u mongodb bash -c                      \
-        "/usr/bin/mongod                            \
-         --dbpath=/data/mongodb                     \
-         --smallfiles --quiet --logappend           \
-         --logpath=/logs/mongodb/mongodb.log        \
-         --fork &> /dev/null"
-    while ! echo exit | nc -z -w 3 localhost 27017;  do sleep 3; done
-    echo "Started"
-fi
+# Configure greylog options
 
 if ! [ -z $ENABLE_SERVER ]; then
     # Set an unusable password if none is set
@@ -193,30 +139,4 @@ if ! [ -z $ENABLE_SERVER ]; then
     fi
     # end email transport configuration
 
-    # Start graylog2 server
-    /opt/graylog2-server/bin/graylogctl start
-
-    echo -n "Waiting for server to be up and running... "
-    while ! graylog2-server/bin/graylogctl status | grep -q "graylog-server running with PID"; do sleep 3; done
-    while ! echo exit | nc -z -w 3 localhost 12900;  do sleep 3; done
-    # Extra sleep for making the interface not yield an error
-    echo "Started"
 fi
-
-# Start monit
-if ! [ -z $ENABLE_MONIT ]; then
-     sh -c "monit -c /etc/monit/monitrc"
-fi
-
-
-# Start graylog2 web interface and leave this as main output
-if ! [ -z $ENABLE_WEB ]; then
-    /opt/graylog2-web-interface/bin/graylog-web-interface
-fi
-
-echo "Started all required services"
-
-# Fallback console logging
-tail -f /dev/null
-
-

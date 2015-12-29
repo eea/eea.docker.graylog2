@@ -4,7 +4,7 @@ MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 RUN echo 'deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen' > /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update -q && \
-    apt-get install wget sudo netcat python3-pip -y && \
+    apt-get install wget sudo netcat python3-pip monit --no-install-recommends -y && \
     apt-get clean && \
     pip3 install chaperone
 
@@ -12,7 +12,7 @@ RUN mkdir -p /data /logs /conf /etc/chaperone.d
 
 WORKDIR /opt
 
-ENV GRAYLOG_VERSION="1.2.1"
+ENV GRAYLOG_VERSION="1.2.2"
 ENV ES_VERSION="1.7.3"
 
 # Get mongo
@@ -48,5 +48,5 @@ RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.
 EXPOSE 9000 12201/udp 12900
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
-COPY ./start.sh start.sh
+COPY ./setup.sh setup.sh
 ENTRYPOINT ["/usr/local/bin/chaperone"]
