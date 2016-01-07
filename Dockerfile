@@ -37,6 +37,5 @@ RUN sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.
 EXPOSE 9000 12201/udp 12900 2812
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
-COPY ./start.sh start.sh
+COPY ./setup.sh setup.sh
 ENTRYPOINT ["/usr/local/bin/chaperone"]
-
