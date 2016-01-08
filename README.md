@@ -82,63 +82,6 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 * ```GRAYLOG_EMAIL_WEB_URL``` - the graylog2 web url used if you want to include links to the stream in your stream alert mails.
 This should define the fully qualified base url to your web interface exactly the same way as it is accessed by your users.
 
-## All in One Graylog2
-use Dockerfile-allinone to build a docker image with elasticsearch and mongodb
-
-### Basic configuration
-#### Simple run:
-```
-docker run -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
-```
-Go to ```localhost:9000``` and log in using the __user:__ _admin_ and the __password:__ _password_
-to check that graylog is running.
-
-#### Making the data persistent:
-To reduce the risk of adding zombie volumes, the default image stores the data
-inside the container. To make it persistent between runs or image upgrades you
-can do one of the following:
-
-* Mount a host volume inside the container:
-
-```
-docker run -v /path/to/your/data:/data -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
-```
-
-/data/mongodb contains mongodb data
-
-/data/elasticsearch contains elasticsearch data
-
-* Use a data-only container.
-  If you don't want to impact the host's filesystem structure and use a
-  container-only solution, you can use a data-only container.
-
-First, create a container having a /data volume and give it an easy to remember
-name:
-
-```
-docker run -v /data --name graylog2data ubuntu true
-```
-
-Then, mount the volumes defined in graylog2data using the --volumes-from
-option.
-
-```
-docker run --volumes-from graylog2data -e GRAYLOG_PASSWORD=password -p 9000:9000 eeacms/graylog2
-```
-
-### Running with an unusable admin password
-If you don't want to version your admin password in a ```docker-compose``` file
-just log into ```localhost:9000``` after running the above command and setup your user or LDAP.
-Then, re-run the image without the GRAYLOG_PASSWORD environment variable.
-
-__Note__: The password salt is regenerated after each image build. If you added
-an user and upgraded the image, the user's credentials will be unusable.
-Follow [these steps](#config) to keep a consistent password salt between image updates.
-
-```
-docker run -v /path/to/your/data:/data -p 9000:9000 eeacms/graylog2
-```
-
 #### Keeping node configuration persistent:
 Graylog2 stores node config in a key: value manner, where the key is the node's id.
 When using docker, the node id is given by the container id wich is regenerated after
@@ -147,14 +90,6 @@ each run. To have a persistent node_id use this:
 ```
 docker run -v /path/to/your/data:/data -p 9000:9000 -e GRAYLOG_NODE_ID=node1 eeacms/graylog2
 ```
-
-#### Running on a multi-node setup(beta)
-
-First, specify your configs locally as specified in the Useful Directories
-section.
-
-Then, enable only the services that you want to run via the ```ENABLED_SERVICES```
-environment variable as specified in the Environment Variables section
 
 ### Useful Directories
 

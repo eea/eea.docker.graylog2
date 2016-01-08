@@ -1,16 +1,19 @@
 FROM java:openjdk-7-jre
+
 MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
+MAINTAINER Luca Pisani <luca.pisani@abstract.it>
 
 RUN apt-get update -q && \
-    apt-get install wget sudo netcat python3-pip pwgen monit --no-install-recommends -y && \
+    apt-get install wget netcat python3-pip pwgen --no-install-recommends -y && \
     apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip3 install chaperone
 
 RUN mkdir -p /data /logs /conf /etc/chaperone.d
 
 WORKDIR /opt
 
-ENV GRAYLOG_VERSION="1.2.2"
+ENV GRAYLOG_VERSION="1.3.2"
 
 # Get graylog2 web and server and install into /opt/
 ENV GRAYLOG_SERVER="graylog-$GRAYLOG_VERSION"
@@ -24,8 +27,8 @@ RUN mv "$GRAYLOG_SERVER" graylog2-server
 RUN mv "$GRAYLOG_WEB" graylog2-web-interface
 RUN mkdir -p /etc/graylog/server/
 
-RUN useradd -s /bin/false -r -M graylog2
-RUN chown graylog2:root /opt/graylog2-server /opt/graylog2-web-interface
+RUN useradd -u 500 -s /bin/false -r -m graylog && \
+    chown -R graylog /opt/graylog2-server /opt/graylog2-web-interface
 
 # Setup basic config
 RUN cp graylog2-server/graylog.conf.example /etc/graylog/server/server.conf
@@ -38,4 +41,6 @@ EXPOSE 9000 12201/udp 12900 2812
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./setup.sh setup.sh
+
 ENTRYPOINT ["/usr/local/bin/chaperone"]
+CMD []

@@ -1,23 +1,7 @@
 #!/bin/bash
 
 # Clean up from previous executions (if any)
-rm -rf /var/run/*.pid /tmp/*.pid
-
-# Make data dirs
-if ! [ -z $ENABLE_ES ]; then
-    mkdir -p /data/elasticsearch
-    mkdir -p /logs/elasticsearch
-    chown -R elasticsearch:elasticsearch /data/elasticsearch /logs/elasticsearch >/dev/null 2>&1
-fi
-
-if ! [ -z $ENABLE_MONGO ]; then
-    mkdir -p /data/mongodb
-    mkdir -p /logs/mongodb
-    chown -R mongodb:mongodb /data/mongodb /logs/mongodb >/dev/null 2>&1
-fi
-
-chmod -R 755 /data
-chmod -R 755 /logs
+rm -rf /var/run/*.pid /tmp/*.pid /opt/graylog2-web-interface/RUNNING_PID
 
 chmod 777 /run    # Assure all users can write their PID files and other transient runtime data
 

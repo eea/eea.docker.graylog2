@@ -1,3 +1,11 @@
+## 1.3.2 (2015-11-5)
+
+#### Features:
+    * Refactor by moving services from start.sh to chaperone.conf
+    * Check security
+    * upgrade Graylog2 to version 1.3.2
+
+
 ## 1.2.1-2 (2015-11-5)
 
 #### Features:
