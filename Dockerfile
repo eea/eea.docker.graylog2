@@ -27,11 +27,11 @@ RUN mv "$GRAYLOG_SERVER" graylog2-server
 RUN mv "$GRAYLOG_WEB" graylog2-web-interface
 RUN mkdir -p /etc/graylog/server/
 
-RUN useradd -u 500 -s /bin/false -r -m graylog && \
-    chown -R graylog /opt/graylog2-server /opt/graylog2-web-interface
-
-# Setup basic config
 RUN cp graylog2-server/graylog.conf.example /etc/graylog/server/server.conf
+RUN useradd -u 500 -s /bin/false -r -m graylog && \
+    chown -R graylog /opt/graylog2-server /opt/graylog2-web-interface /etc/graylog
+
+# Setup basic config    
 RUN sed -i -e "s/password_secret =.*$/password_secret = $(pwgen -s 96)/" /etc/graylog/server/server.conf
 RUN sed -i -e "s/mongodb:\/\/localhost\/graylog2.*$/mongodb:\/\/mongodb.service\/graylog2/" /etc/graylog/server/server.conf
 RUN sed -i -e "s/application.secret=.*$/application.secret=$(pwgen -s 96)/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
@@ -41,6 +41,8 @@ EXPOSE 9000 12201/udp 12900 2812
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./setup.sh setup.sh
+
+USER graylog
 
 ENTRYPOINT ["/usr/local/bin/chaperone"]
 CMD []

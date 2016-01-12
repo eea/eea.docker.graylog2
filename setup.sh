@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Clean up from previous executions (if any)
-rm -rf /var/run/*.pid /tmp/*.pid /opt/graylog2-web-interface/RUNNING_PID
-
-chmod 777 /run    # Assure all users can write their PID files and other transient runtime data
+rm -rf /tmp/*.pid /opt/graylog2-web-interface/RUNNING_PID
 
 # Override defaults if set in the /conf volume
 if [ -f /conf/graylog-server.conf ]; then
