@@ -1,6 +1,4 @@
 FROM java:openjdk-7-jre
-
-MAINTAINER Mihai Bivol <mihai.bivol@eaudeweb.ro>
 MAINTAINER Luca Pisani <luca.pisani@abstract.it>
 
 RUN apt-get update -q && \
