@@ -2,6 +2,7 @@ FROM java:openjdk-7-jre
 MAINTAINER Luca Pisani <luca.pisani@abstract.it>
 
 RUN apt-get update -q && \
+    apt-get upgrade -y libc6 && \ 
     apt-get install wget netcat python3-pip pwgen --no-install-recommends -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
