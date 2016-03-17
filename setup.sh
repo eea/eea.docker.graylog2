@@ -1,21 +1,42 @@
 #!/bin/bash
 
-# Clean up from previous executions (if any)
-rm -rf /tmp/*.pid /opt/graylog2-web-interface/RUNNING_PID
-
-# Override defaults if set in the /conf volume
-if [ -f /conf/graylog-server.conf ]; then
-    cp /conf/graylog-server.conf /etc/graylog/server/server.conf
-    echo "Running with custom server conf"
-fi
-if [ -f /conf/graylog-web-interface.conf ]; then
-    cp /conf/graylog-web-interface.conf /opt/graylog2-web-interface/conf/graylog-web-interface.conf
-    echo "Running with custom web interface conf"
-fi
+chmod 777 /run    # Assure all users can write their PID files and other transient runtime data
 
 # Configure greylog options
 
 if ! [ -z $ENABLE_SERVER ]; then
+    # Clean up from previous executions (if any)
+    rm -rf /var/run/*.pid /tmp/*.pid
+
+    # Override defaults if set in the /conf volume
+    if [ -f /conf/graylog-server.conf ]; then
+        cp /conf/graylog-server.conf /etc/graylog/server/server.conf
+        echo "Running with custom server conf"
+    fi
+
+    # Set GRAYLOG_HOSTNAME
+    if ! [ -z $GRAYLOG_HOSTNAME ]; then
+        sed -i -e "s/rest_listen_uri.*=.*$/rest_listen_uri = http:\/\/$GRAYLOG_HOSTNAME:12900\//" /etc/graylog/server/server.conf
+        echo "Hostname setted"
+        $GRAYLOG_HOSTNAME=""
+    fi
+
+    # Set GRAYLOG_SECRET
+    if ! [ -z $GRAYLOG_SECRET ]; then
+        sed -i -e "s/password_secret.*=.*$/password_secret = $GRAYLOG_SECRET/" /etc/graylog/server/server.conf
+        echo "Secret password set using env var"
+    else
+        sed -i -e "s/password_secret.*=.*$/password_secret = $(pwgen -s 96)/" /etc/graylog/server/server.conf
+        echo "Secret password generated and set"
+        $GRAYLOG_SECRET=""
+    fi
+
+    # Set GRAYLOG_MASTER
+    if ! [ -z $GRAYLOG_MASTER ]; then
+        sed -i -e "s/is_master.*=.*$/is_master = $GRAYLOG_MASTER/" /etc/graylog/server/server.conf
+        echo "Master var set"
+    fi
+
     # Set an unusable password if none is set
     if [ -z $GRAYLOG_PASSWORD ] && \
        ! grep -q -E 'root_password_sha2 = .+' /etc/graylog/server/server.conf; then
@@ -114,11 +135,31 @@ if ! [ -z $ENABLE_SERVER ]; then
     fi
     if ! [ -z $GRAYLOG_EMAIL_WEB_URL ]; then
         echo -n "Set email web url... "
-        sed -i -e "s|#transport_email_web_interface_url.*=.*$|transport_email_web_interface_url = $GRAYLOG_EMAIL_WEB_URL|" /etc/graylog/server/server.conf
+        sed -i -e "s/#transport_email_web_interface_url.*=.*$|transport_email_web_interface_url = $GRAYLOG_EMAIL_WEB_URL|" /etc/graylog/server/server.conf
         # Reset env vars so no clear variable is available on the machine
         GRAYLOG_EMAIL_WEB_URL=""
         echo "Done"
     fi
     # end email transport configuration
 
+fi
+
+if ! [ -z $ENABLE_WEB ]; then
+    # Clean up from previous executions (if any)
+    rm -rf /opt/graylog2-web-interface/RUNNING_PID
+    
+    # Override defaults if set in the /conf volume
+    if [ -f /conf/graylog-web-interface.conf ]; then
+        cp /conf/graylog-web-interface.conf /opt/graylog2-web-interface/conf/graylog-web-interface.conf
+        echo "Running with custom web interface conf"
+    fi
+
+    # Set GRAYLOG_SERVER_URIS
+    if ! [ -z $GRAYLOG_SERVER_URIS ]; then
+        safe_pattern=$(printf '%s\n' "$GRAYLOG_SERVER_URIS" | sed 's/[[\.*^$/]/\\&/g')
+        sed -i -e "s/graylog2-server.uris.*=.*$/graylog2-server.uris=\"${safe_pattern}\"/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
+        echo "Set SERVER_URIS"
+    else
+        sed -i -e "s/graylog2-server.uris.*=.*$/graylog2-server.uris=\"http:\/\/localhost:12900\/\"/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
+    fi
 fi

@@ -1,3 +1,11 @@
+## 1.3.3 (2016-03-21)
+
+#### Features:
+    * Enable multinodes
+    * Check security
+    * upgrade Graylog2 to version 1.3.3
+    
+
 ## 1.3.2 (2015-11-5)
 
 #### Features:

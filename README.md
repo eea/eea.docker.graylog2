@@ -7,7 +7,8 @@ Fit for open-source apps and configs.
 Can run without specifying an admin password.
 
 ## Versions:
-* latest: Graylog2 1.3.2
+* latest: Graylog2 1.3.3
+* 1.3.3: Graylog2 1.3.3
 * 1.3.2: Graylog2 1.3.2
 * 1.2.2: Graylog2 1.2.2
 * 1.2.1-2: Graylog2 1.2.1 with email transport configuration
@@ -30,6 +31,23 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 
 ## Environment variables
 
+* ```GRAYLOG_HOSTNAME``` - the hostname to set into ```rest_listen_uri```. 
+  __Note:__ Default value ```127.0.0.1```
+
+* ```GRAYLOG_SECRET``` - You must set a secret that is used for password encryption
+  end salting here. The server will refuse to start if it’s not set. Generate a 
+  secret with for example pwgen -N 1 -s 96.
+  If you not set this variable, a secret password will be generated for you.
+  __Note:__ If you run multiple graylog-server nodes, make sure you use the same 
+  ```password_secret``` for all of them!
+
+* ```GRAYLOG_MASTER``` - Set only one graylog-server node as the master.
+  This node will perform periodical and maintenance actions that slave nodes won’t.
+  Every slave node will accept messages just as the master nodes. Nodes will fall
+  back to slave mode if there already is a master in the cluster.
+  ***Important*** Possible value is ```true``` or ```false```.
+
+
 * ```GRAYLOG_PASSWORD``` - run the container overriding the admin password with
   the value of this parameter. If no password is set either via ```/config``` or
   this parameter, the server will run with an unusable auto-generated password.
@@ -39,7 +57,7 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 
   __Note:__ Use this parameter when you want to make non-global inputs persistent.
 
-* ```ENABLED_SERVICES```(beta) - a list of comma separated values of the services to
+* ```ENABLED_SERVICES``` - a list of comma separated values of the services to
   be ran in this container. The available services are: ```elasticsearch```,
   ```mongodb```, ```graylog-server```, ```graylog-web```. By default __all__
   services are started.
@@ -50,10 +68,15 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
   __Note:__ Mongo and ElasticSearch are not directly configurable
   so please use this option with at either ```graylog-server``` or ```graylog-web``` set.
 
+* ```GRAYLOG_SERVER_URIS``` -  This is the list of graylog-server nodes the web 
+  interface will try to use. You can configure one or multiple, separated by commas.
+  Use the ```rest_listen_uri``` (configured in graylog.conf) of your graylog-server instances here.
+  __Note:__ Default value ```http://localhost:12900/```
+
 ### Email transport configuration
 
 * ```GRAYLOG_EMAIL_ENABLED``` - run the container with transport mail enable.
- 
+
   __Note:__ the value of this parameter is ```true``` or ```false```
 
 * ```GRAYLOG_EMAIL_HOSTNAME``` - the hostname of mail server.
