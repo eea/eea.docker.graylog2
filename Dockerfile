@@ -11,7 +11,7 @@ RUN mkdir -p /data /logs /conf /etc/chaperone.d
 
 WORKDIR /opt
 
-ENV GRAYLOG_VERSION="1.3.3"
+ENV GRAYLOG_VERSION="1.3.4"
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 # Get graylog2 web and server and install into /opt/
 ENV GRAYLOG_SERVER="graylog-$GRAYLOG_VERSION"

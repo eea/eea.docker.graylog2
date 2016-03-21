@@ -1,10 +1,22 @@
 #!/bin/bash
 
-chmod 777 /run    # Assure all users can write their PID files and other transient runtime data
+# Parse enabled services
+if [ -z $ENABLED_SERVICES ]; then
+    ENABLED_SERVICES="graylog-web,graylog-server"
+fi
+
+for service in $(echo $ENABLED_SERVICES | sed 's/ //g' | sed 's/,/\n/g'); do
+    if [ "graylog-web" = $service ]; then
+        ENABLE_WEB="true"
+    fi
+    if [ "graylog-server" = $service ]; then
+        ENABLE_SERVER="true"
+    fi
+done
 
 # Configure greylog options
-
 if ! [ -z $ENABLE_SERVER ]; then
+
     # Clean up from previous executions (if any)
     rm -rf /var/run/*.pid /tmp/*.pid
 
@@ -18,7 +30,7 @@ if ! [ -z $ENABLE_SERVER ]; then
     if ! [ -z $GRAYLOG_HOSTNAME ]; then
         sed -i -e "s/rest_listen_uri.*=.*$/rest_listen_uri = http:\/\/$GRAYLOG_HOSTNAME:12900\//" /etc/graylog/server/server.conf
         echo "Hostname setted"
-        $GRAYLOG_HOSTNAME=""
+        GRAYLOG_HOSTNAME=""
     fi
 
     # Set GRAYLOG_SECRET
@@ -28,7 +40,7 @@ if ! [ -z $ENABLE_SERVER ]; then
     else
         sed -i -e "s/password_secret.*=.*$/password_secret = $(pwgen -s 96)/" /etc/graylog/server/server.conf
         echo "Secret password generated and set"
-        $GRAYLOG_SECRET=""
+        GRAYLOG_SECRET=""
     fi
 
     # Set GRAYLOG_MASTER
@@ -135,7 +147,8 @@ if ! [ -z $ENABLE_SERVER ]; then
     fi
     if ! [ -z $GRAYLOG_EMAIL_WEB_URL ]; then
         echo -n "Set email web url... "
-        sed -i -e "s/#transport_email_web_interface_url.*=.*$|transport_email_web_interface_url = $GRAYLOG_EMAIL_WEB_URL|" /etc/graylog/server/server.conf
+        safe_pattern=$(printf '%s\n' "$GRAYLOG_EMAIL_WEB_URL" | sed 's/[[\.*^$/]/\\&/g')
+        sed -i -e "s/#transport_email_web_interface_url.*=.*$/transport_email_web_interface_url = ${safe_pattern}/" /etc/graylog/server/server.conf
         # Reset env vars so no clear variable is available on the machine
         GRAYLOG_EMAIL_WEB_URL=""
         echo "Done"
@@ -147,7 +160,7 @@ fi
 if ! [ -z $ENABLE_WEB ]; then
     # Clean up from previous executions (if any)
     rm -rf /opt/graylog2-web-interface/RUNNING_PID
-    
+
     # Override defaults if set in the /conf volume
     if [ -f /conf/graylog-web-interface.conf ]; then
         cp /conf/graylog-web-interface.conf /opt/graylog2-web-interface/conf/graylog-web-interface.conf
