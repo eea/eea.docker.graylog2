@@ -73,7 +73,15 @@ if ! [ -z $ENABLE_SERVER ]; then
         echo $GRAYLOG_NODE_ID > $ID_FILE
         echo "Done"
     fi
-
+    
+    # Set GRAYLOG_ELASTIC_REPLICA
+    if ! [ -z $GRAYLOG_ELASTIC_REPLICA ]; then
+        sed -i -e "s/#elasticsearch_discovery_zen_ping_multicast_enabled.*=.*$/elasticsearch_discovery_zen_ping_multicast_enabled = false/" /etc/graylog/server/server.conf
+        safe_pattern=$(printf '%s\n' "$GRAYLOG_ELASTIC_REPLICA" | sed "s/[[\.*^$/]/\\&/g")
+        sed -i -e "s/#elasticsearch_discovery_zen_ping_unicast_hosts.*=.*$/elasticsearch_discovery_zen_ping_unicast_hosts = \"${safe_pattern}\"/" /etc/graylog/server/server.conf
+        echo "Set GRAYLOG_ELASTIC_REPLICA"
+    fi
+    
     # Email transport configuration
     if ! [ -z $GRAYLOG_EMAIL_ENABLED ]; then
         echo -n "Enable mail transport... "
