@@ -33,7 +33,7 @@ RUN sed -i -e "s/mongodb:\/\/localhost\/graylog2.*$/mongodb:\/\/mongodb.service\
     sed -i -e "s/application.secret=.*$/application.secret=$(pwgen -s 96)/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf && \
     sed -i -e "s/graylog2-server.uris=.*$/graylog2-server.uris=\"http:\/\/127.0.0.1:12900\/\"/" /opt/graylog2-web-interface/conf/graylog-web-interface.conf
 
-EXPOSE 9000 12201/udp 12900 2812
+EXPOSE 9000 12201/udp 12900
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./setup.sh setup.sh
