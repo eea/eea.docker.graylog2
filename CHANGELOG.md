@@ -1,3 +1,8 @@
+## 1.3.4.1 (2016-04-14)
+
+#### Features:
+   * Add restart features at alert notify
+
 ## 1.3.3 (2016-03-21)
 
 #### Features:

@@ -37,6 +37,7 @@ EXPOSE 9000 12201/udp 12900
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./setup.sh setup.sh
+COPY ./graylog_restart.sh check_restart.sh
 
 USER graylog
 
