@@ -22,7 +22,7 @@ Can run without specifying an admin password.
 * ElasticSearch - [https://www.elastic.co](https://www.elastic.co)
 * MongoDB - [https://www.mongodb.org](https://www.mongodb.org)
 
-For a quick configuration example view [eea.docker.logcentral](https://github.com/eea/eea.docker.logcentral/blob/master/docker-compose.yml)
+For a quick configuration example view [eea.docker.logcentral](https://github.com/eea/eea.docker.logcentral/blob/master/docker-compose.singlenode.yml)
 
 ## Ports
 
