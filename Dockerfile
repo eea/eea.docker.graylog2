@@ -26,6 +26,9 @@ RUN useradd -u 500 -s /bin/false -r -m graylog \
  && cp graylog2/graylog.conf.example /etc/graylog/server/server.conf \
  && chown -R graylog /opt/graylog2 /etc/graylog
 
+COPY config/log4j2.xml /etc/graylog/server/
+ENV LOG4J="-Dlog4j.configurationFile=/etc/graylog/server/log4j2.xml"
+
 # Setup basic config
 RUN sed -i -e "s/mongodb:\/\/localhost\/graylog.*$/mongodb:\/\/mongodb\/graylog2/" /etc/graylog/server/server.conf \
  && sed -i -e "s/rest_listen_uri.*=.*$/rest_listen_uri = http:\/\/0.0.0.0:12900\//" /etc/graylog/server/server.conf \
