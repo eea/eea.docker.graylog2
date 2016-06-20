@@ -1,15 +1,13 @@
-# If you are running more than one instances of graylog2-server you have to select one of these
+# If you are running more than one instances of Graylog server you have to select one of these
 # instances as master. The master will perform some periodical tasks that non-masters won't perform.
 is_master = true
 
 # The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
-# to use an absolute file path here if you are starting graylog2-server from init scripts or similar.
+# to use an absolute file path here if you are starting Graylog server from init scripts or similar.
 node_id_file = /etc/graylog/server/node-id
 
 # You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters.
 # Generate one by using for example: pwgen -N 1 -s 96
-# NOTE if not set it will be inited by the Docker build command
-# it is advised to override it in your config
 password_secret =
 
 # The default root user is named 'admin'
@@ -21,33 +19,36 @@ password_secret =
 # modify it in this file.
 # Create one by using for example: echo -n yourpassword | shasum -a 256
 # and put the resulting hash value into the following line
-# NOTE if not set it will be inited by the Docker script
 root_password_sha2 =
 
 # The email address of the root user.
 # Default is empty
 #root_email = ""
 
-# The time zone setting of the root user.
+# The time zone setting of the root user. See http://www.joda.org/joda-time/timezones.html for a list of valid time zones.
 # Default is UTC
 #root_timezone = UTC
 
 # Set plugin directory here (relative or absolute)
 plugin_dir = plugin
 
-# REST API listen URI. Must be reachable by other graylog2-server nodes if you run a cluster.
+# REST API listen URI. Must be reachable by other Graylog server nodes if you run a cluster.
+# When using Graylog Collectors, this URI will be used to receive heartbeat messages and must be accessible for all collectors.
 rest_listen_uri = http://127.0.0.1:12900/
 
 # REST API transport address. Defaults to the value of rest_listen_uri. Exception: If rest_listen_uri
 # is set to a wildcard IP address (0.0.0.0) the first non-loopback IPv4 system address is used.
-# This will be promoted in the cluster discovery APIs and other nodes may try to connect on this
-# address. (see rest_listen_uri)
+# If set, this will be promoted in the cluster discovery APIs, so other nodes may try to connect on
+# this address and it is used to generate URLs addressing entities in the REST API. (see rest_listen_uri)
+# You will need to define this, if your Graylog server is running behind a HTTP proxy that is rewriting
+# the scheme, host name or URI.
+# This must not contain a wildcard address (0.0.0.0).
 #rest_transport_uri = http://192.168.1.1:12900/
 
 # Enable CORS headers for REST API. This is necessary for JS-clients accessing the server directly.
 # If these are disabled, modern browsers will not be able to retrieve resources from the server.
-# This is disabled by default. Uncomment the next line to enable it.
-#rest_enable_cors = true
+# This is enabled by default. Uncomment the next line to disable it.
+#rest_enable_cors = false
 
 # Enable GZIP support for REST API. This compresses API responses and therefore helps to reduce
 # overall round trip times. This is disabled by default. Uncomment the next line to enable it.
@@ -58,17 +59,14 @@ rest_listen_uri = http://127.0.0.1:12900/
 # next line to enable it.
 #rest_enable_tls = true
 
-# The X.509 certificate file to use for securing the REST API.
-#rest_tls_cert_file = /path/to/graylog2.crt
+# The X.509 certificate chain file in PEM format to use for securing the REST API.
+#rest_tls_cert_file = /path/to/graylog.crt
 
-# The private key to use for securing the REST API.
-#rest_tls_key_file = /path/to/graylog2.key
+# The PKCS#8 private key file in PEM format to use for securing the REST API.
+#rest_tls_key_file = /path/to/graylog.key
 
 # The password to unlock the private key used for securing the REST API.
 #rest_tls_key_password = secret
-
-# The maximum size of a single HTTP chunk in bytes.
-#rest_max_chunk_size = 8192
 
 # The maximum size of the HTTP request headers in bytes.
 #rest_max_header_size = 8192
@@ -76,14 +74,58 @@ rest_listen_uri = http://127.0.0.1:12900/
 # The maximal length of the initial HTTP/1.1 line in bytes.
 #rest_max_initial_line_length = 4096
 
-# The size of the execution handler thread pool used exclusively for serving the REST API.
+# The size of the thread pool used exclusively for serving the REST API.
 #rest_thread_pool_size = 16
 
-# The size of the worker thread pool used exclusively for serving the REST API.
-#rest_worker_threads_max_pool_size = 16
+# Comma separated list of trusted proxies that are allowed to set the client address with X-Forwarded-For
+# header. May be subnets, or hosts.
+#trusted_proxies = 127.0.0.1/32, 0:0:0:0:0:0:0:1/128
 
-# Embedded Elasticsearch configuration file
-# pay attention to the working directory of the server, maybe use an absolute path here
+# Enable the embedded Graylog web interface.
+# Default: true
+#web_enable = false
+
+# Web interface listen URI. It must not contain a path other than "/".
+#web_listen_uri = http://127.0.0.1:9000/
+
+# Web interface endpoint URI. This setting can be overriden on a per-request basis with the X-Graylog-Server-URL header.
+# Default: $rest_transport_uri
+#web_endpoint_uri =
+
+# Enable CORS headers for the web interface. This is necessary for JS-clients accessing the server directly.
+# If these are disabled, modern browsers will not be able to retrieve resources from the server.
+#web_enable_cors = false
+
+# Enable/disable GZIP support for the web interface. This compresses HTTP responses and therefore helps to reduce
+# overall round trip times. This is enabled by default. Uncomment the next line to disable it.
+#web_enable_gzip = false
+
+# Enable HTTPS support for the web interface. This secures the communication of the web browser with the web interface
+# using TLS to prevent request forgery and eavesdropping.
+# This is disabled by default. Uncomment the next line to enable it and see the other related configuration settings.
+#web_enable_tls = true
+
+# The X.509 certificate chain file in PEM format to use for securing the web interface.
+#web_tls_cert_file = /path/to/graylog-web.crt
+
+# The PKCS#8 private key file in PEM format to use for securing the web interface.
+#web_tls_key_file = /path/to/graylog-web.key
+
+# The password to unlock the private key used for securing the web interface.
+#web_tls_key_password = secret
+
+# The maximum size of the HTTP request headers in bytes.
+#web_max_header_size = 8192
+
+# The maximal length of the initial HTTP/1.1 line in bytes.
+#web_max_initial_line_length = 4096
+
+# The size of the thread pool used exclusively for serving the web interface.
+#web_thread_pool_size = 16
+
+# Configuration file for the embedded Elasticsearch instance in Graylog.
+# Pay attention to the working directory of the server, maybe use an absolute path here.
+# Default: empty
 #elasticsearch_config_file = /etc/graylog/server/elasticsearch.yml
 
 # Graylog will use multiple indices to store documents in. You can configured the strategy it uses to determine
@@ -92,16 +134,25 @@ rest_listen_uri = http://127.0.0.1:12900/
 #   - "count" of messages per index, use elasticsearch_max_docs_per_index below to configure
 #   - "size" per index, use elasticsearch_max_size_per_index below to configure
 # valid values are "count", "size" and "time", default is "count"
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 rotation_strategy = count
 
 # (Approximate) maximum number of documents in an Elasticsearch index before a new index
 # is being created, also see no_retention and elasticsearch_max_number_of_indices.
 # Configure this if you used 'rotation_strategy = count' above.
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 elasticsearch_max_docs_per_index = 20000000
 
 # (Approximate) maximum size in bytes per Elasticsearch index on disk before a new index is being created, also see
 # no_retention and elasticsearch_max_number_of_indices. Default is 1GB.
 # Configure this if you used 'rotation_strategy = size' above.
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 #elasticsearch_max_size_per_index = 1073741824
 
 # (Approximate) maximum time before a new Elasticsearch index is being created, also see
@@ -114,6 +165,9 @@ elasticsearch_max_docs_per_index = 20000000
 #  1d  = 1 day
 #  12h = 12 hours
 # Permitted suffixes are: d for day, h for hour, m for minute, s for second.
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 #elasticsearch_max_time_per_index = 1d
 
 # Disable checking the version of Elasticsearch for being compatible with this Graylog release.
@@ -124,12 +178,18 @@ elasticsearch_max_docs_per_index = 20000000
 #no_retention = false
 
 # How many indices do you want to keep?
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 elasticsearch_max_number_of_indices = 20
 
 # Decide what happens with the oldest indices when the maximum number of indices is reached.
 # The following strategies are availble:
 #   - delete # Deletes the index completely (Default)
 #   - close # Closes the index and hides it from the system. Can be re-opened later.
+#
+# ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
+#            to your previous 1.x settings so they will be migrated to the database!
 retention_strategy = delete
 
 # How many Elasticsearch shards and replicas should be used per index? Note that this only applies to newly created indices.
@@ -137,7 +197,11 @@ elasticsearch_shards = 4
 elasticsearch_replicas = 0
 
 # Prefix for all Elasticsearch indices and index aliases managed by Graylog.
-elasticsearch_index_prefix = graylog2
+elasticsearch_index_prefix = graylog
+
+# Name of the Elasticsearch index template used by Graylog to apply the mandatory index mapping.
+# # Default: graylog-internal
+#elasticsearch_template_name = graylog-internal
 
 # Do you want to allow searches with leading wildcards? This can be extremely resource hungry and should only
 # be enabled with care. See also: https://www.graylog.org/documentation/general/queries/
@@ -150,12 +214,20 @@ allow_highlighting = false
 # settings to be passed to elasticsearch's client (overriding those in the provided elasticsearch_config_file)
 # all these
 # this must be the same as for your Elasticsearch cluster
-#elasticsearch_cluster_name = graylog2
+#elasticsearch_cluster_name = graylog
 
-# you could also leave this out, but makes it easier to identify the graylog2 client instance
-#elasticsearch_node_name = graylog2-server
+# The prefix being used to generate the Elasticsearch node name which makes it easier to identify the specific Graylog
+# server running the embedded Elasticsearch instance. The node name will be constructed by concatenating this prefix
+# and the Graylog node ID (see node_id_file), for example "graylog-17052010-1234-5678-abcd-1337cafebabe".
+# Default: graylog-
+#elasticsearch_node_name_prefix = graylog-
 
-# we don't want the graylog2 server to store any data, or be master node
+# A comma-separated list of Elasticsearch nodes which Graylog is using to connect to the Elasticsearch cluster,
+# see https://www.elastic.co/guide/en/elasticsearch/reference/2.3/modules-discovery-zen.html for details.
+# Default: 127.0.0.1
+#elasticsearch_discovery_zen_ping_unicast_hosts = 127.0.0.1:9300, 127.0.0.2:9500
+
+# we don't want the Graylog server to store any data, or be master node
 #elasticsearch_node_master = false
 #elasticsearch_node_data = false
 
@@ -165,14 +237,16 @@ allow_highlighting = false
 # we don't need to run the embedded HTTP server here
 #elasticsearch_http_enabled = false
 
+# Enable Elasticsearch multicast discovery. This requires the installation of an Elasticsearch plugin,
+# see https://www.elastic.co/guide/en/elasticsearch/plugins/2.3/discovery-multicast.html for details.
+# Default: false
 #elasticsearch_discovery_zen_ping_multicast_enabled = false
-#elasticsearch_discovery_zen_ping_unicast_hosts = 192.168.1.203:9300
 
 # Change the following setting if you are running into problems with timeouts during Elasticsearch cluster discovery.
 # The setting is specified in milliseconds, the default is 5000ms (5 seconds).
 #elasticsearch_cluster_discovery_timeout = 5000
 
-# the following settings allow to change the bind addresses for the Elasticsearch client in graylog2
+# the following settings allow to change the bind addresses for the Elasticsearch client in Graylog
 # these settings are empty by default, letting Elasticsearch choose automatically,
 # override them here or in the 'elasticsearch_config_file' if you need to bind to a special address
 # refer to http://www.elasticsearch.org/guide/en/elasticsearch/reference/0.90/modules-network.html
@@ -190,6 +264,16 @@ allow_highlighting = false
 # Elasticsearch documentation: http://www.elasticsearch.org/guide/reference/index-modules/analysis/
 # Note that this setting only takes effect on newly created indices.
 elasticsearch_analyzer = standard
+
+# Global request timeout for Elasticsearch requests (e. g. during search, index creation, or index time-range
+# calculations) based on a best-effort to restrict the runtime of Elasticsearch operations.
+# Default: 1m
+#elasticsearch_request_timeout = 1m
+
+# Time interval for index range information cleanups. This setting defines how often stale index range information
+# is being purged from the database.
+# Default: 1h
+#index_ranges_cleanup_interval = 1h
 
 # Batch size for the Elasticsearch output. This is the maximum (!) number of messages the Elasticsearch output
 # module will get at once and write to Elasticsearch in a batch call. If the configured batch size has not been
@@ -235,7 +319,6 @@ processor_wait_strategy = blocking
 
 # Size of internal ring buffers. Raise this if raising outputbuffer_processors does not help anymore.
 # For optimum performance your LogMessage objects in the ring buffer should fit in your CPU L3 cache.
-# Start server with --statistics flag to see buffer utilization.
 # Must be a power of 2. (512, 1024, 2048, ...)
 ring_size = 65536
 
@@ -264,17 +347,13 @@ message_journal_dir = data/journal
 # Number of threads used exclusively for dispatching internal events. Default is 2.
 #async_eventbus_processors = 2
 
-# EXPERIMENTAL: Dead Letters
-# Every failed indexing attempt is logged by default and made visible in the web-interface. You can enable
-# the experimental dead letters feature to write every message that was not successfully indexed into the
-# MongoDB "dead_letters" collection to make sure that you never lose a message. The actual writing of dead
-# letter should work fine already but it is not heavily tested yet and will get more features in future
-# releases.
-dead_letters_enabled = false
-
 # How many seconds to wait between marking node as DEAD for possible load balancers and starting the actual
 # shutdown process. Set to 0 if you have no status checking load balancers in front.
 lb_recognition_period_seconds = 3
+
+# Journal usage percentage that triggers requesting throttling for this server node from load balancers. The feature is
+# disabled if not set.
+#lb_throttle_threshold_percentage = 95
 
 # Every message is matched against the configured streams and it can happen that a stream contains rules which
 # take an unusual amount of time to run, for example if its using regular expressions that perform excessive backtracking.
@@ -290,7 +369,7 @@ lb_recognition_period_seconds = 3
 # and alarms are being sent.
 #alert_check_interval = 60
 
-# Since 0.21 the graylog2 server supports pluggable output modules. This means a single message can be written to multiple
+# Since 0.21 the Graylog server supports pluggable output modules. This means a single message can be written to multiple
 # outputs. The next setting defines the timeout for a single output module, including the default output module where all
 # messages end up.
 #
@@ -303,20 +382,23 @@ lb_recognition_period_seconds = 3
 # Time in milliseconds which Graylog is waiting for all threads to stop on shutdown.
 #shutdown_timeout = 30000
 
-# MongoDB Configuration
-mongodb_useauth = false
-#mongodb_user = grayloguser
-#mongodb_password = 123
-mongodb_host = 127.0.0.1
-#mongodb_replica_set = localhost:27017,localhost:27018,localhost:27019
-mongodb_database = graylog2
-mongodb_port = 27017
+# MongoDB connection string
+# See http://docs.mongodb.org/manual/reference/connection-string/ for details
+mongodb_uri = mongodb://localhost/graylog
 
-# Raise this according to the maximum connections your MongoDB server can handle if you encounter MongoDB connection problems.
-mongodb_max_connections = 100
+# Authenticate against the MongoDB server
+#mongodb_uri = mongodb://grayloguser:secret@localhost:27017/graylog
+
+# Use a replica set instead of a single host
+#mongodb_uri = mongodb://grayloguser:secret@localhost:27017,localhost:27018,localhost:27019/graylog
+
+# Increase this value according to the maximum connections your MongoDB server can handle from a single client
+# if you encounter MongoDB connection problems.
+mongodb_max_connections = 1000
 
 # Number of threads allowed to be blocked by MongoDB connections multiplier. Default: 5
-# If mongodb_max_connections is 100, and mongodb_threads_allowed_to_block_multiplier is 5, then 500 threads can block. More than that and an exception will be thrown.
+# If mongodb_max_connections is 100, and mongodb_threads_allowed_to_block_multiplier is 5,
+# then 500 threads can block. More than that and an exception will be thrown.
 # http://api.mongodb.org/java/current/com/mongodb/MongoOptions.html#threadsAllowedToBlockForConnectionMultiplier
 mongodb_threads_allowed_to_block_multiplier = 5
 
@@ -333,14 +415,29 @@ mongodb_threads_allowed_to_block_multiplier = 5
 #transport_email_use_ssl = true
 #transport_email_auth_username = you@example.com
 #transport_email_auth_password = secret
-#transport_email_subject_prefix = [graylog2]
-#transport_email_from_email = graylog2@example.com
+#transport_email_subject_prefix = [graylog]
+#transport_email_from_email = graylog@example.com
 
 # Specify and uncomment this if you want to include links to the stream in your stream alert mails.
 # This should define the fully qualified base url to your web interface exactly the same way as it is accessed by your users.
-#transport_email_web_interface_url = https://graylog2.example.com
+#transport_email_web_interface_url = https://graylog.example.com
 
-# HTTP proxy for outgoing HTTP calls
+# The default connect timeout for outgoing HTTP connections.
+# Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
+# Default: 5s
+#http_connect_timeout = 5s
+
+# The default read timeout for outgoing HTTP connections.
+# Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
+# Default: 10s
+#http_read_timeout = 10s
+
+# The default write timeout for outgoing HTTP connections.
+# Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
+# Default: 10s
+#http_write_timeout = 10s
+
+# HTTP proxy for outgoing HTTP connections
 #http_proxy_uri =
 
 # Disable the optimization of Elasticsearch indices after index cycling. This may take some load from Elasticsearch
@@ -352,12 +449,6 @@ mongodb_threads_allowed_to_block_multiplier = 5
 # on heavily used systems with large indices, but it will decrease search performance. The default is 1.
 #index_optimization_max_num_segments = 1
 
-# Disable the index range calculation on all open/available indices and only calculate the range for the latest
-# index. This may speed up index cycling on systems with large indices but it might lead to wrong search results
-# in regard to the time range of the messages (i. e. messages within a certain range may not be found). The default
-# is to calculate the time range on all open/available indices.
-#disable_index_range_calculation = true
-
 # The threshold of the garbage collection runs. If GC runs take longer than this threshold, a system notification
 # will be generated to warn the administrator about possible problems with the system. Default is 1 second.
 #gc_warning_threshold = 1s
@@ -365,40 +456,24 @@ mongodb_threads_allowed_to_block_multiplier = 5
 # Connection timeout for a configured LDAP server (e. g. ActiveDirectory) in milliseconds.
 #ldap_connection_timeout = 2000
 
-# https://github.com/bazhenov/groovy-shell-server
-#groovy_shell_enable = false
-#groovy_shell_port = 6789
-
 # Enable collection of Graylog-related metrics into MongoDB
+# WARNING: This will add *a lot* of data into your MongoDB database on a regular interval (1 second)!
+# DEPRECATED: This setting and the respective feature will be removed in a future version of Graylog.
 #enable_metrics_collection = false
 
 # Disable the use of SIGAR for collecting system stats
 #disable_sigar = false
 
-# TELEMETRY
-# Enable publishing Telemetry data
-#telemetry_enabled = false
+# The default cache time for dashboard widgets. (Default: 10 seconds, minimum: 1 second)
+#dashboard_widget_default_cache_time = 10s
 
-# Base URL of the Telemetry service
-#telemetry_url = https://telemetry-in.graylog.com/submit/
+# Automatically load content packs in "content_packs_dir" on the first start of Graylog.
+#content_packs_loader_enabled = true
 
-# Authentication token for the Telemetry service
-#telemetry_token = 
+# The directory which contains content packs which should be loaded on the first start of Graylog.
+#content_packs_dir = data/contentpacks
 
-# How often the Telemetry data should be reported
-#telemetry_report_interval = 1m
-
-# Number of Telemetry data sets to store locally if the connection to the Telemetry service fails
-#telemetry_max_queue_size = 10
-
-# TTL for Telemetry data in local cache
-#telemetry_cache_timeout = 1m
-
-# Connect timeout for HTTP connections
-#telemetry_service_connect_timeout = 	1s
-
-# Write timeout for HTTP connections
-#telemetry_service_write_timeout = 5s
-
-# Read timeout for HTTP connections
-#telemetry_service_read_timeout = 5s
+# A comma-separated list of content packs (files in "content_packs_dir") which should be applied on
+# the first start of Graylog.
+# Default: empty
+content_packs_auto_load = grok-patterns.json
