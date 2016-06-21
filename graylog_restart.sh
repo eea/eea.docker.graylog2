@@ -7,7 +7,8 @@ LOGS=$(awk -v d1="$(date -u --date="-5 min" "+%Y-%m-%d %H:%M:%S.000")" \
        | grep "ERROR: org.graylog2.alarmcallbacks.EmailAlarmCallback - Stream" )
 
 if [[ $LOGS ]]; then
-   kill -9 `cat /tmp/graylog.pid`
+   /opt/graylog2/bin/graylogctl stop
+   sleep 1
    /opt/graylog2/bin/graylogctl start
    echo "$(date -u "+%Y-%m-%d %H:%M:%S.%3N") Graylog server restarted"  >> $LOGFILE
 fi
