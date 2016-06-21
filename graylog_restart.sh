@@ -1,5 +1,5 @@
 #! /bin/bash
-LOGFILE=/opt/graylog2-server/log/graylog_restarted.log
+LOGFILE=/opt/graylog2/log/graylog_restarted.log
 
 LOGS=$(awk -v d1="$(date -u --date="-5 min" "+%Y-%m-%d %H:%M:%S.000")" \
        -v d2="$(date -u "+%Y-%m-%d %H:%M:%S.%3N")" \
