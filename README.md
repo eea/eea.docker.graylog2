@@ -87,6 +87,8 @@ When using docker, the node id is given by the container id wich is regenerated 
 each run. To have a persistent node_id use this:
 
 ```
+docker run --name some-mongo -d mongo
+docker run --name some-elasticsearch -d elasticsearch elasticsearch -Des.cluster.name="graylog2"
 docker run -v /path/to/your/data:/data -p 9000:9000 12900:12900 eeacms/graylog2
 ```
 
