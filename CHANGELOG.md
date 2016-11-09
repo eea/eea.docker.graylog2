@@ -1,3 +1,8 @@
+## 2.1.2 (2016-11-09)
+
+#### Features:
+    * upgrade Graylog2 to version 2.1.2
+
 ## 1.3.4.1 (2016-04-14)
 
 #### Features:
