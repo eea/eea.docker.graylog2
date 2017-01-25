@@ -7,7 +7,7 @@ Fit for open-source apps and configs.
 Can run without specifying an admin password.
 
 ## Versions:
-* latest: Graylog2 2.0.3
+* latest: Graylog2 2.1.3
 * 2.0.3: Graylog2 2.0.3
 * 2.0.2: Graylog2 2.0.2
 * 1.3.4: Graylog2 1.3.4
