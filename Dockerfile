@@ -55,7 +55,5 @@ COPY ./setup.sh setup.sh
 WORKDIR /opt/graylog2
 COPY ./graylog_restart.sh check_restart.sh
 
-USER graylog
-
 ENTRYPOINT ["/usr/local/bin/chaperone"]
 CMD []
