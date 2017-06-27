@@ -31,7 +31,7 @@ ENV LOG4J="-Dlog4j.configurationFile=/etc/graylog/server/log4j2.xml"
 
 # Setup basic config
 RUN sed -i -e "s/mongodb:\/\/localhost\/graylog.*$/mongodb:\/\/mongodb\/graylog2/" /etc/graylog/server/server.conf \
- && sed -i -e "s/rest_listen_uri.*=.*$/rest_listen_uri = http:\/\/0.0.0.0:12900\//" /etc/graylog/server/server.conf \
+ && sed -i -e "s/rest_listen_uri.*=.*$/rest_listen_uri = http:\/\/0.0.0.0:9000\/api\//" /etc/graylog/server/server.conf \
  && sed -i -e "s/#web_listen_uri.*=.*$/web_listen_uri = http:\/\/0.0.0.0:9000\//" /etc/graylog/server/server.conf \
  && sed -i -e "s/#web_enable_cors.*=.*$/web_enable_cors = true/" /etc/graylog/server/server.conf \
  && sed -i -e "s/allow_leading_wildcard_searches.*=.*$/allow_leading_wildcard_searches = true/" /etc/graylog/server/server.conf \
@@ -47,7 +47,7 @@ RUN sed -i -e "s/mongodb:\/\/localhost\/graylog.*$/mongodb:\/\/mongodb\/graylog2
  && sed -i -e "s/-Xms1g -Xmx1g/\$GRAYLOG_HEAP_SIZE -Dgraylog2.installation_source=docker/g" /opt/graylog2/bin/graylogctl \
  && sed -i -e '/DEFAULT_JAVA_OPTS=/ i GRAYLOG_HEAP_SIZE=${GRAYLOG_HEAP_SIZE:=-Xms1g -Xmx1g}' /opt/graylog2/bin/graylogctl
 
-EXPOSE 9000 12201/udp 12900
+EXPOSE 9000 12201/udp
 
 COPY chaperone.conf /etc/chaperone.d/chaperone.conf
 COPY ./setup.sh setup.sh

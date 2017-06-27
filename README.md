@@ -8,7 +8,7 @@ Can run without specifying an admin password.
 
 ## Versions:
 * latest: Graylog2 2.2.3
-* 2.2-3.0 Graylog2 2.2.3
+* 2.2-3.1 Graylog2 2.2.3
 * 2.0.3: Graylog2 2.0.3
 * 2.0.2: Graylog2 2.0.2
 * 1.3.4: Graylog2 1.3.4
@@ -30,7 +30,6 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 ## Ports
 
 * 9000 - Graylog2 web interface
-* 12900 - Graylog2 server API (DEPRECATED, API is now at :9000/api)
 * 12201 - GELF input
 
 ## Configuration
@@ -90,7 +89,7 @@ each run. To have a persistent node_id use this:
 ```
 docker run --name some-mongo -d mongo
 docker run --name some-elasticsearch -d elasticsearch elasticsearch -Des.cluster.name="graylog2"
-docker run -v /path/to/your/data:/data -p 9000:9000 12900:12900 eeacms/graylog2
+docker run -v /path/to/your/data:/data -p 9000:9000 eeacms/graylog2
 ```
 
 ### Useful Directories

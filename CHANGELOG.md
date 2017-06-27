@@ -1,7 +1,10 @@
+## 2.2-3.1 (2017-06-27)
+    * Update Graylog to version 2.2.3
+
 ## 1.3.4.1 (2016-04-14)
 
 #### Features:
-   * Add restart features at alert notify
+    * Add restart features at alert notify
 
 ## 1.3.3 (2016-03-21)
 
