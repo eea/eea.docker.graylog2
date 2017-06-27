@@ -7,7 +7,8 @@ Fit for open-source apps and configs.
 Can run without specifying an admin password.
 
 ## Versions:
-* latest: Graylog2 2.2.1
+* latest: Graylog2 2.2.3
+* 2.2-3.0 Graylog2 2.2.3
 * 2.0.3: Graylog2 2.0.3
 * 2.0.2: Graylog2 2.0.2
 * 1.3.4: Graylog2 1.3.4
@@ -29,7 +30,7 @@ For a quick configuration example view [eea.docker.logcentral](https://github.co
 ## Ports
 
 * 9000 - Graylog2 web interface
-* 12900 - Graylog2 server API
+* 12900 - Graylog2 server API (DEPRECATED, API is now at :9000/api)
 * 12201 - GELF input
 
 ## Configuration
