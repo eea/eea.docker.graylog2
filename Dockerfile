@@ -15,7 +15,7 @@ WORKDIR /opt/
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 
 # Get graylog2 web and server and install into /opt/
-ENV GRAYLOG_VERSION="2.1.3"
+ENV GRAYLOG_VERSION="2.2.3"
 ENV GRAYLOG_SERVER="graylog-$GRAYLOG_VERSION"
 
 RUN useradd -u 500 -s /bin/false -r -m graylog \
