@@ -6,6 +6,10 @@ Fit for open-source apps and configs.
 
 Can run without specifying an admin password.
 
+## DEPRECATED
+
+Please use [the official Graylog2 image](https://hub.docker.com/r/graylog2/server)
+
 ## Versions:
 * latest: Graylog2 2.2.3
 * 2.2-3.1 Graylog2 2.2.3
